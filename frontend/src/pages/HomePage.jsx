@@ -20,7 +20,7 @@ const HomePage = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [dateQuery]);
+  }, [dateQuery, filter]);
 
   useEffect(() => {
     setPage(1);
@@ -29,7 +29,7 @@ const HomePage = () => {
   // logic
   const fetchTasks = async () => {
     try {
-      const res = await api.get(`/tasks?filter=${dateQuery}`);
+      const res = await api.get(`/tasks?filter=${dateQuery}&status=${filter}`);
       setTaskBuffer(res.data.tasks);
       setActiveTaskCount(res.data.activeCount);
       setCompleteTaskCount(res.data.completeCount);
@@ -44,7 +44,7 @@ const HomePage = () => {
       case "active":
         return task.status === "active";
       case "completed":
-        return task.status === "complete";
+        return task.status === "completed";
       default:
         return true;
     }

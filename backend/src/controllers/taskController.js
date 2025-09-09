@@ -1,7 +1,7 @@
 import Task from "../models/Task.js";
 
 export const getAllTasks = async (req, res) => {
-    const { filter = "today" } = req.query;
+    const { filter = "today", status = "all" } = req.query;
     const now = new Date();
     let startDate;
 
@@ -26,16 +26,26 @@ export const getAllTasks = async (req, res) => {
       }
     }
 
+    const taskPipeline = [];
+
+    // Nếu status khác "all" thì mới thêm match
+    if (status !== "all") {
+      taskPipeline.push({ $match: { status } });
+    }
+
+    // Luôn sort theo createdAt
+    taskPipeline.push({ $sort: { createdAt: -1 } });
+
     const query = startDate ? { createdAt: { $gte: startDate } } : {};
   try {
     const result = await Task.aggregate([
       { $match: query },
       {
         $facet: {
-          tasks: [{ $sort: { createdAt: -1 } }],
+          tasks: taskPipeline,
           activeCount: [{ $match: { status: "active" } }, { $count: "count" }],
           completeCount: [
-            { $match: { status: "complete" } },
+            { $match: { status: "completed" } },
             { $count: "count" },
           ],
         },

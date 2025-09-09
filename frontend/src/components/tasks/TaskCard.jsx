@@ -70,7 +70,7 @@ export const TaskCard = ({ task, index, handleTaskChanged }) => {
     <Card
       className={cn(
         "p-4 bg-gradient-card border-0 shadow-custom-md hover:shadow-custom-lg transition-all duration-200 animate-fade-in group",
-        task.status === "complete" && "opacity-75"
+        task.status === "completed" && "opacity-75"
       )}
       style={{ animationDelay: `${index * 50}ms` }}
     >
@@ -112,7 +112,7 @@ export const TaskCard = ({ task, index, handleTaskChanged }) => {
             <p
               className={cn(
                 "text-base transition-all duration-200",
-                task.status === "complete"
+                task.status === "completed"
                   ? "line-through text-muted-foreground"
                   : "text-foreground"
               )}
