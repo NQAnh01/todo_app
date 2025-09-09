@@ -3,15 +3,15 @@ import { Card } from '../ui/card';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import { Plus } from 'lucide-react';
-import axios from 'axios';
 import { toast } from 'sonner';
+import api from '@/lib/axios';
 
 export const AddTask = ({ handleNewTaskAdded }) => {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const addTask = async () => {
     if (newTaskTitle.trim()) {
       try {
-        await axios.post("/tasks", {
+        await api.post("/tasks", {
           title: newTaskTitle,
         });
         toast.success(`Nhiệm vụ ${newTaskTitle} đã được thêm vào.`);
