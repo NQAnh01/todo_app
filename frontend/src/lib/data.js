@@ -23,4 +23,4 @@ export const options = [
   },
 ];
 
-export const visibleTaskLimit = 1;
+export const visibleTaskLimit = 10;
