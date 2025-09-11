@@ -3,6 +3,12 @@ import { Filter } from 'lucide-react';
 import React from 'react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const StatusAndFilter = ({
   completedTasksCount = 0,
@@ -10,9 +16,6 @@ export const StatusAndFilter = ({
   filter = "all",
   setFilter,
 }) => {
-  const handleFilter = (type) => {
-    setFilter(type);
-  };
   return (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
       <div className="flex gap-3">
@@ -30,20 +33,33 @@ export const StatusAndFilter = ({
         </Badge>
       </div>
 
-      <div className="flex flex-col gap-2 sm:flex-row">
-        {Object.keys(FilterType).map((type) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
-            key={type}
-            variant={filter === type ? "gradient" : "ghost"}
+            variant="gradient"
             size="sm"
-            className="capitalize"
-            onClick={() => handleFilter(type)}
+            className="capitalize flex items-center gap-2"
           >
             <Filter className="size-4" />
-            {FilterType[type]}
+            {FilterType[filter]}
           </Button>
-        ))}
-      </div>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent align="end" className="w-40">
+          {Object.keys(FilterType).map((type) => (
+            <DropdownMenuItem
+              key={type}
+              onClick={() => setFilter(type)}
+              className={`capitalize cursor-pointer ${
+                filter === type ? "bg-primary/10 font-medium" : ""
+              }`}
+            >
+              <Filter className="size-4 mr-2" />
+              {FilterType[type]}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

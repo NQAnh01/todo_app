@@ -17,10 +17,12 @@ const HomePage = () => {
   const [completeTaskCount, setCompleteTaskCount] = useState(0);
   const [filter, setFilter] = useState("all");
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchTasks();
-  }, [dateQuery, filter]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dateQuery, filter, page]);
 
   useEffect(() => {
     setPage(1);
@@ -29,26 +31,18 @@ const HomePage = () => {
   // logic
   const fetchTasks = async () => {
     try {
-      const res = await api.get(`/tasks?filter=${dateQuery}&status=${filter}`);
+      const res = await api.get(
+        `/tasks?filter=${dateQuery}&status=${filter}&page=${page}&limit=${visibleTaskLimit}`
+      );
       setTaskBuffer(res.data.tasks);
       setActiveTaskCount(res.data.activeCount);
       setCompleteTaskCount(res.data.completeCount);
+      setTotalPages(res.data.totalPages);
     } catch (error) {
       console.error("Lỗi xảy ra khi truy xuất tasks:", error);
       toast.error("Lỗi xảy ra khi truy xuất tasks.");
     }
   };
-
-  const filteredTasks = taskBuffer.filter((task) => {
-    switch (filter) {
-      case "active":
-        return task.status === "active";
-      case "completed":
-        return task.status === "completed";
-      default:
-        return true;
-    }
-  });
 
   const handleTaskChanged = () => {
     fetchTasks();
@@ -70,28 +64,17 @@ const HomePage = () => {
     setPage(newPage);
   };
 
-  const visibleTasks = filteredTasks.slice(
-    (page - 1) * visibleTaskLimit,
-    page * visibleTaskLimit
-  );
-
-  if (visibleTasks.length === 0) {
-    handlePrev();
-  }
-
-  const totalPages = Math.ceil(filteredTasks.length / visibleTaskLimit);
-
   return (
-    <div className="min-h-screen w-full relative">
-      {/* Radial Gradient Background from Bottom */}
+    <div className="min-h-screen w-full bg-[#fefcff] relative">
+      {/* Dreamy Sky Pink Glow */}
       <div
         className="absolute inset-0 z-0"
         style={{
-          background:
-            "radial-gradient(125% 125% at 50% 90%, #fff 40%, #475569 100%)",
+          backgroundImage: `
+      radial-gradient(circle at 30% 70%, rgba(173, 216, 230, 0.35), transparent 60%),
+      radial-gradient(circle at 70% 30%, rgba(255, 182, 193, 0.4), transparent 60%)`,
         }}
       />
-      {/* Your Content/Components */}
       <div className="container relative z-10 pt-8 mx-auto">
         <div className="w-full max-w-2xl p-6 mx-auto space-y-6">
           <Header />
@@ -103,7 +86,7 @@ const HomePage = () => {
             setFilter={setFilter}
           />
           <TaskList
-            filteredTasks={filteredTasks}
+            filteredTasks={taskBuffer}
             filter={filter}
             handleTaskChanged={handleTaskChanged}
           />

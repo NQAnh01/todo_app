@@ -16,11 +16,11 @@ export const Paginate = ({
   page,
   totalPages,
 }) => {
+  if (totalPages <= 1) return null;
   const generatePages = () => {
     const pages = [];
 
     if (totalPages < 4) {
-      // hiện toàn bộ
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }

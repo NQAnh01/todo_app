@@ -1,7 +1,12 @@
 import Task from "../models/Task.js";
 
 export const getAllTasks = async (req, res) => {
-    const { filter = "today", status = "all" } = req.query;
+    const {
+      filter = "today",
+      status = "all",
+      page = 1,
+      limit = 10,
+    } = req.query;
     const now = new Date();
     let startDate;
 
@@ -42,7 +47,16 @@ export const getAllTasks = async (req, res) => {
       { $match: query },
       {
         $facet: {
-          tasks: taskPipeline,
+          tasks: [
+            ...(status !== "all" ? [{ $match: { status } }] : []),
+            { $sort: { createdAt: -1 } },
+            { $skip: (parseInt(page) - 1) * parseInt(limit) },
+            { $limit: parseInt(limit) },
+          ],
+          totalCount: [
+            ...(status !== "all" ? [{ $match: { status } }] : []),
+            { $count: "count" },
+          ],
           activeCount: [{ $match: { status: "active" } }, { $count: "count" }],
           completeCount: [
             { $match: { status: "completed" } },
@@ -53,10 +67,17 @@ export const getAllTasks = async (req, res) => {
     ]);
 
     const tasks = result[0].tasks;
+    const totalCount = result[0].totalCount[0]?.count || 0;
     const activeCount = result[0].activeCount[0]?.count || 0;
     const completeCount = result[0].completeCount[0]?.count || 0;
 
-    res.status(200).json({ tasks, activeCount, completeCount });
+    res.status(200).json({
+      tasks,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      activeCount,
+      completeCount,
+    });
   } catch (error) {
     console.error('Error fetching tasks:', error);
     res.status(500).json({ message: 'Internal server error' });

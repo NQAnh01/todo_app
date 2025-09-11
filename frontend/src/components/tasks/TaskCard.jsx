@@ -10,56 +10,64 @@ import { Input } from '../ui/input';
 export const TaskCard = ({ task, index, handleTaskChanged }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [updateTaskTitle, setUpdateTaskTitle] = useState(task.title || "");
+    const [isProcessing, setIsProcessing] = useState(false);
     
-  const deleteTask = async (taskId) => {
-    try {
-      await api.delete(`/tasks/${taskId}`);
-      toast.success("Nhiệm vụ đã xoá.");
-      handleTaskChanged();
-    } catch (error) {
-      console.error("Lỗi xảy ra khi xoá task.", error);
-      toast.error("Lỗi xảy ra khi xoá nhiệm vụ mới.");
-    }
-  };
-
-  const updateTask = async () => {
-    try {
-      setIsEditing(false);
-      await api.put(`/tasks/${task._id}`, {
-        title: updateTaskTitle,
-      });
-      toast.success(`Nhiệm vụ đã đổi thành ${updateTaskTitle}`);
-      handleTaskChanged();
-    } catch (error) {
-      console.error("Lỗi xảy ra khi update task.", error);
-      toast.error("Lỗi xảy ra khi cập nhập nhiệm vụ.");
-    }
-  };
-
-  const toggleTaskCompleteButton = async () => {
-    try {
-      if (task.status === "active") {
-        await api.put(`/tasks/${task._id}`, {
-          status: "completed",
-          completedAt: new Date().toISOString(),
-        });
-
-        toast.success(`${task.title} đã hoàn thành.`);
-      } else {
-        await api.put(`/tasks/${task._id}`, {
-          status: "active",
-          completedAt: null,
-        });
-        toast.success(`${task.title} đã đổi sang chưa hoàn thành.`);
+    const deleteTask = async (taskId) => {
+      try {
+        setIsProcessing(true);
+        await api.delete(`/tasks/${taskId}`);
+        toast.success("Task has been deleted.");
+        handleTaskChanged();
+      } catch (error) {
+        console.error("Error occurred while deleting task.", error);
+        toast.error("Failed to delete task.");
+      } finally {
+        setIsProcessing(false);
       }
+    };
 
-      handleTaskChanged();
-    } catch (error) {
-      console.error("Lỗi xảy ra khi update task.", error);
-      toast.error("Lỗi xảy ra khi cập nhập nhiệm vụ.");
-    }
-  };
+    const updateTask = async () => {
+      try {
+        setIsProcessing(true);
+        setIsEditing(false);
+        await api.put(`/tasks/${task._id}`, {
+          title: updateTaskTitle,
+        });
+        toast.success(`Task has been updated to "${updateTaskTitle}".`);
+        handleTaskChanged();
+      } catch (error) {
+        console.error("Error occurred while updating task.", error);
+        toast.error("Failed to update task.");
+      } finally {
+        setIsProcessing(false);
+      }
+    };
 
+    const toggleTaskCompleteButton = async () => {
+      try {
+        setIsProcessing(true);
+        if (task.status === "active") {
+          await api.put(`/tasks/${task._id}`, {
+            status: "completed",
+            completedAt: new Date().toISOString(),
+          });
+          toast.success(`"${task.title}" marked as completed.`);
+        } else {
+          await api.put(`/tasks/${task._id}`, {
+            status: "active",
+            completedAt: null,
+          });
+          toast.success(`"${task.title}" marked as active again.`);
+        }
+
+        handleTaskChanged();
+      } catch (error) {
+        console.error("Error occurred while toggling task status.", error);
+        toast.error("Failed to update task status.");
+      } finally {
+        setIsProcessing(false);
+      }
+    };    
 
   const handleKeyPress = (event) => {
     if (event.key === "Enter") {
@@ -78,6 +86,7 @@ export const TaskCard = ({ task, index, handleTaskChanged }) => {
         <Button
           variant="ghost"
           size="icon"
+          disabled={isProcessing}
           className={cn(
             "flex-shrink-0 size-8 rounded-full transition-all duration-200",
             task.status === "completed"
@@ -103,6 +112,7 @@ export const TaskCard = ({ task, index, handleTaskChanged }) => {
               value={updateTaskTitle}
               onChange={(e) => setUpdateTaskTitle(e.target.value)}
               onKeyPress={handleKeyPress}
+              disabled={isProcessing}
               onBlur={() => {
                 setIsEditing(false);
                 setUpdateTaskTitle(task.title || "");
@@ -143,6 +153,7 @@ export const TaskCard = ({ task, index, handleTaskChanged }) => {
           <Button
             variant="ghost"
             size="icon"
+            disabled={isProcessing}
             className="flex-shrink-0 transition-colors size-8 text-muted-foreground hover:text-info"
             onClick={() => {
               setIsEditing(true);
@@ -156,6 +167,7 @@ export const TaskCard = ({ task, index, handleTaskChanged }) => {
           <Button
             variant="ghost"
             size="icon"
+            disabled={isProcessing}
             className="flex-shrink-0 transition-colors size-8 text-muted-foreground hover:text-destructive"
             onClick={() => deleteTask(task._id)}
           >

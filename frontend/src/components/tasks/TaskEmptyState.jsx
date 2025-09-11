@@ -3,7 +3,6 @@ import { Circle } from "lucide-react";
 import { Card } from "../ui/card";
 
 export const TaskEmptyState = ({ filter }) => {
-
   return (
     <Card className="p-8 text-center border-0 bg-gradient-card shadow-custom-md">
       <div className="space-y-3">
@@ -11,17 +10,17 @@ export const TaskEmptyState = ({ filter }) => {
         <div>
           <h3 className="font-medium text-foreground">
             {filter === "active"
-              ? "Không có nhiệm vụ nào đang làm."
+              ? "No active tasks."
               : filter === "completed"
-              ? "Chưa có nhiệm vụ nào hoàn thành."
-              : "Chưa có nhiệm vụ."}
+              ? "No completed tasks yet."
+              : "No tasks available."}
           </h3>
 
           <p className="text-sm text-muted-foreground">
             {filter === "all"
-              ? "Thêm nhiệm vụ đầu tiên vào để bắt đầu!"
-              : `Chuyển sang "tất cả" để thấy những nhiệm vụ ${
-                  filter === "active" ? "đã hoàn thành." : "đang làm."
+              ? "Add your first task to get started!"
+              : `Switch to "All" to see the tasks that are ${
+                  filter === "active" ? "completed." : "still active."
                 }`}
           </p>
         </div>
@@ -29,4 +28,3 @@ export const TaskEmptyState = ({ filter }) => {
     </Card>
   );
 };
-
