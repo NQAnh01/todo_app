@@ -13,7 +13,7 @@ const NotFound = () => {
         href="/"
         className="inline-block px-6 py-3 mt-6 font-medium text-white transition shadow-md bg-primary rounded-2xl hover:bg-primary-dark"
       >
-        Quay về trang chủ
+        Trang chủ
       </a>
     </div>
   );
